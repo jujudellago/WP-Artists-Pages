@@ -1,14 +1,14 @@
 <?php
 /**
- * Team profiles
+ * Artist pages
  *
- * Create a "Meet our team" page in WordPress using 
+ * Create a "Meet our artist" page in WordPress using 
  * custom post types, taxonomies, and Advanced Custom
  * Fields
  */
-if ( !class_exists('TeamProfiles') ):
+if ( !class_exists('ArtistPages') ):
 
-class TeamProfiles
+class ArtistPages
 {
 	/**
 	 * Initialize & hook into WP
@@ -34,21 +34,21 @@ class TeamProfiles
 	
 	
 	/**
-	 * Load CSS for template-team.php
+	 * Load CSS for template-artist.php
 	 */
 	public function load_styles() {
-		if ( is_page_template('template-team.php') )
-	   	wp_enqueue_style( 'team-template', get_stylesheet_directory_uri() . '/assets/css/team.css' );
+		if ( is_page_template('template-artist.php') )
+	   	wp_enqueue_style( 'artist-template', get_stylesheet_directory_uri() . '/assets/css/artist.css' );
 	}
 	
 	
 	/**
 	 * Theme setup
 	 *
-	 * Create a custom thumbnail size for our team avatars
+	 * Create a custom thumbnail size for our artist avatars
 	 */
 	public function after_setup_theme() {
-	  add_image_size('team-thumb', 100, 100, true); // 100px x 100px with hard crop enabled
+	  add_image_size('artist-thumb', 100, 100, true); // 100px x 100px with hard crop enabled
 	}
 	
 	
@@ -66,7 +66,7 @@ class TeamProfiles
 		// Display message
 		$install_link = admin_url('plugin-install.php?tab=search&type=term&s=Advanced+Custom+Fields&plugin-search-input=Search+Plugins');
 		$html =  '<div class="error"><p>';
-		$html .= '<strong>Team Profiles</strong> needs the <a href="http://www.advancedcustomfields.com/" target="_blank">Advanced Custom Fields</a> plugin to work. Please <a href="' . $install_link . '">install it now</a>.';
+		$html .= '<strong>Artist pages</strong> needs the <a href="http://www.advancedcustomfields.com/" target="_blank">Advanced Custom Fields</a> plugin to work. Please <a href="' . $install_link . '">install it now</a>.';
 		$html .= '</p></div>';
 		
 		echo $html;
@@ -82,8 +82,8 @@ class TeamProfiles
 		$labels = array(
 			'name' => _x("Team", "post type general name"),
 			'singular_name' => _x("Team", "post type singular name"),
-			'menu_name' => 'Team Profiles',
-			'add_new' => _x("Add New", "team item"),
+			'menu_name' => 'Artist pages',
+			'add_new' => _x("Add New", "artist item"),
 			'add_new_item' => __("Add New Profile"),
 			'edit_item' => __("Edit Profile"),
 			'new_item' => __("New Profile"),
@@ -95,11 +95,11 @@ class TeamProfiles
 		);
 		
 		// Register post type
-		register_post_type('team' , array(
+		register_post_type('artist' , array(
 			'labels' => $labels,
 			'public' => true,
 			'has_archive' => false,
-			'menu_icon' => get_stylesheet_directory_uri() . '/lib/TeamProfiles/team-icon.png',
+			'menu_icon' => get_stylesheet_directory_uri() . '/lib/ArtistPages/artist-icon.png',
 			'rewrite' => false,
 			'supports' => array('title', 'editor', 'thumbnail')
 		) );
@@ -127,8 +127,8 @@ class TeamProfiles
 			'new_item_name' => __("New $singular Name"),
 		);
 
-		// Register and attach to 'team' post type
-		register_taxonomy( strtolower($singular), 'team', array(
+		// Register and attach to 'artist' post type
+		register_taxonomy( strtolower($singular), 'artist', array(
 			'public' => true,
 			'show_ui' => true,
 			'show_in_nav_menus' => true,
@@ -148,19 +148,19 @@ class TeamProfiles
 		global $post;
 	
 		// Caching, re-run query if not found or expired
-		$transient_label = __CLASS__ . "_" . __FUNCTION__; // Transient label will be 'TeamProfiles_display'
+		$transient_label = __CLASS__ . "_" . __FUNCTION__; // Transient label will be 'ArtistPages_display'
 		if ( false === ( $html = get_transient($transient_label) ) ) {
 
-		   // Get 'team' posts
-			$team_posts = get_posts( array(
-				'post_type' => 'team',
+		   // Get 'artist' posts
+			$artist_posts = get_posts( array(
+				'post_type' => 'artist',
 				'posts_per_page' => 50, // Unlimited posts
 				'orderby' => 'title', // Order alphabetically by name
 				'order' => 'ASC' // Start with 'A'
 			) );
 			
 			$html = null;
-			if ( $team_posts ):
+			if ( $artist_posts ):
 			
 			// Gather output
 		   ob_start();
@@ -168,40 +168,40 @@ class TeamProfiles
 			<section class="row profiles">
 				<div class="intro">
 					<h2>Meet The Team</h2>
-					<p class="lead">&ldquo;Individuals can and do make a difference, but it takes a team<br>to really mess things up.&rdquo;</p>
+					<p class="lead">&ldquo;Individuals can and do make a difference, but it takes a artist<br>to really mess things up.&rdquo;</p>
 				</div>
 				
 				<?php 
-				foreach ( $team_posts as $post ): 
+				foreach ( $artist_posts as $post ): 
 				setup_postdata($post);
 				
 				// Resize and CDNize thumbnails using Automattic Photon service
 				$thumb_src = null;
 				if ( has_post_thumbnail($post->ID) ) {
-					$src = wp_get_attachment_image_src( get_post_thumbnail_id( $post->ID ), 'team-thumb' );
+					$src = wp_get_attachment_image_src( get_post_thumbnail_id( $post->ID ), 'artist-thumb' );
 					$thumb_src = $src[0];
 				}
 				?>
 				<article class="col-sm-6 profile">
 					<div class="profile-header">
 						<?php if ( $thumb_src ): ?>
-						<img src="<?php echo $thumb_src; ?>" alt="<?php the_title(); ?>, <?php the_field('team_position'); ?>" class="img-circle">
+						<img src="<?php echo $thumb_src; ?>" alt="<?php the_title(); ?>, <?php the_field('artist_position'); ?>" class="img-circle">
 						<?php endif; ?>
 					</div>
 					
 					<div class="profile-content">
 						<h3><?php the_title(); ?></h3>
-						<p class="lead position"><?php the_field('team_position'); ?></p>
+						<p class="lead position"><?php the_field('artist_position'); ?></p>
 						<?php the_content(); ?>
 					</div>
 					
 					<div class="profile-footer">
-						<a href="tel:<?php the_field('team_phone'); ?>"><i class="icon-mobile-phone"></i></a>
-						<a href="mailto:<?php echo antispambot( get_field('team_email') ); ?>"><i class="icon-envelope"></i></a>
-						<?php if ( $twitter = get_field('team_twitter') ): ?>
+						<a href="tel:<?php the_field('artist_phone'); ?>"><i class="icon-mobile-phone"></i></a>
+						<a href="mailto:<?php echo antispambot( get_field('artist_email') ); ?>"><i class="icon-envelope"></i></a>
+						<?php if ( $twitter = get_field('artist_twitter') ): ?>
 						<a href="<?php echo $twitter; ?>"><i class="icon-twitter"></i></a>
 						<?php endif; ?>
-						<?php if ( $linkedin = get_field('team_linkedin') ): ?>
+						<?php if ( $linkedin = get_field('artist_linkedin') ): ?>
 						<a href="<?php echo $linkedin; ?>"><i class="icon-linkedin"></i></a>
 						<?php endif; ?>
 					</div>
@@ -213,7 +213,7 @@ class TeamProfiles
 		   $html = ob_get_contents();
 		   ob_end_clean();
 		   
-			endif; // end if $team_posts
+			endif; // end if $artist_posts
 
 		   // Store output in cache
 		   set_transient( $transient_label, $html, DAY_IN_SECONDS );
@@ -224,6 +224,6 @@ class TeamProfiles
 	}
 }
 
-$TeamProfiles = new TeamProfiles();
+$ArtistPages = new ArtistPages();
 
 endif;
